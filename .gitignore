@@ -32,6 +32,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# design reference bundle (large source images, not part of the app)
+/_design_reference/
+
+# local editor / tooling
+/.claude/
 
 # vercel
 .vercel
