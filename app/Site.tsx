@@ -31,6 +31,7 @@ const PILLARS = [
     title: "Travel",
     body: "Flights, stays, and ground handled end to end — so your people arrive ready, not rattled.",
     photo: "/assets/photo-travel.webp",
+    objectPosition: "62% 28%",
     background:
       "radial-gradient(120% 100% at 78% 12%,rgba(232,92,68,0.24),transparent 54%),repeating-linear-gradient(135deg,rgba(244,237,216,0.05) 0 1px,transparent 1px 48px),linear-gradient(165deg,#1e1f44 0%,#141431 60%,#0f1026 100%)",
     scrim:
@@ -44,6 +45,7 @@ const PILLARS = [
     title: "Activations",
     body: "Point-of-sale moments that stop traffic and make your brand impossible to walk past.",
     photo: "/assets/photo-activations.webp",
+    objectPosition: "50% 42%",
     background:
       "radial-gradient(120% 100% at 74% 14%,rgba(232,92,68,0.26),transparent 56%),repeating-linear-gradient(135deg,rgba(244,237,216,0.05) 0 1px,transparent 1px 48px),linear-gradient(160deg,#26337f 0%,#1b2360 58%,#11163f 100%)",
     scrim:
@@ -57,6 +59,7 @@ const PILLARS = [
     title: "Events",
     body: "Conferences, incentives, and retreats engineered to move the room and bring teams closer.",
     photo: "/assets/photo-events.webp",
+    objectPosition: "50% 40%",
     background:
       "radial-gradient(120% 100% at 80% 10%,rgba(232,92,68,0.2),transparent 52%),radial-gradient(100% 90% at 20% 90%,rgba(244,237,216,0.08),transparent 55%),repeating-linear-gradient(135deg,rgba(244,237,216,0.05) 0 1px,transparent 1px 48px),linear-gradient(165deg,#191a3c 0%,#111228 60%,#0b0c1e 100%)",
     scrim:
@@ -325,7 +328,7 @@ export default function Site() {
             background: p.background,
           }}
         >
-          <Image src={p.photo} alt="" fill sizes="100vw" style={{ objectFit: "cover" }} />
+          <Image src={p.photo} alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: p.objectPosition }} />
           <div style={{ position: "absolute", inset: 0, background: p.scrim, pointerEvents: "none" }} />
           <div style={{ position: "relative", maxWidth: "62ch" }}>
             <div style={{ fontFamily: ARCHIVO, fontSize: 12, fontWeight: 600, letterSpacing: "0.32em", textTransform: "uppercase", color: CORAL, marginBottom: 18 }}>
