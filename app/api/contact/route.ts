@@ -13,15 +13,6 @@ type Payload = {
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-// Where enquiries are delivered. Override with CONTACT_TO in env if needed.
-const TO = process.env.CONTACT_TO || "hello@journeytravel.group";
-// Verified sender on your Resend account (a domain you've verified in Resend).
-const FROM = process.env.CONTACT_FROM || "Journey Travel Group <hello@journeytravel.group>";
-
-function esc(s: string) {
-  return s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c] as string));
-}
-
 export async function POST(req: Request) {
   let body: Payload;
   try {
@@ -45,12 +36,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Please complete all fields." }, { status: 422 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
+  const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
 
   // No key configured yet — accept the submission so the UI works, but log it.
-  // Wire RESEND_API_KEY in Vercel to start delivering emails.
-  if (!apiKey) {
-    console.warn("[contact] RESEND_API_KEY not set — enquiry received but not emailed:", {
+  // Set WEB3FORMS_ACCESS_KEY in Vercel to start delivering emails.
+  if (!accessKey) {
+    console.warn("[contact] WEB3FORMS_ACCESS_KEY not set — enquiry received but not emailed:", {
       name,
       company,
       email,
@@ -59,35 +50,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, delivered: false });
   }
 
-  const html = `
-    <h2>New enquiry — ${esc(service)}</h2>
-    <p><strong>Name:</strong> ${esc(name)}</p>
-    <p><strong>Company:</strong> ${esc(company)}</p>
-    <p><strong>Email:</strong> ${esc(email)}</p>
-    <p><strong>Service:</strong> ${esc(service)}</p>
-    <p><strong>Message:</strong></p>
-    <p style="white-space:pre-wrap">${esc(message)}</p>
-  `;
-
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
-        from: FROM,
-        to: [TO],
-        reply_to: email,
+        access_key: accessKey,
         subject: `New enquiry from ${name} — ${company} (${service})`,
-        html,
+        from_name: "Journey Travel Group Website",
+        replyto: email, // replies go straight to the enquirer
+        // These fields are included in the email body:
+        name,
+        company,
+        email,
+        service,
+        message,
       }),
     });
 
-    if (!res.ok) {
-      const detail = await res.text();
-      console.error("[contact] Resend error:", res.status, detail);
+    const data = (await res.json().catch(() => ({}))) as { success?: boolean; message?: string };
+
+    if (!res.ok || !data.success) {
+      console.error("[contact] Web3Forms error:", res.status, data.message);
       return NextResponse.json({ error: "Could not send enquiry." }, { status: 502 });
     }
 
