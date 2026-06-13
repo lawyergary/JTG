@@ -122,8 +122,8 @@ export default function Site() {
       return;
     }
 
-    // Honeypot: bots fill this hidden field — silently accept without sending.
-    if (honeypot.current?.value) {
+    // Honeypot: bots tick this hidden checkbox — silently accept without sending.
+    if (honeypot.current?.checked) {
       setSubmitted(true);
       return;
     }
@@ -398,15 +398,17 @@ export default function Site() {
           <div style={{ flex: "1 1 420px", minWidth: 300 }}>
             {!submitted ? (
               <form onSubmit={submit} noValidate style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-                {/* Honeypot — hidden from real users */}
+                {/* Honeypot — hidden from real users. A checkbox (not a text
+                    input) so browser/password-manager autofill can't trip it;
+                    only bots that tick every field get caught. */}
                 <input
                   ref={honeypot}
-                  type="text"
-                  name="company_url"
+                  type="checkbox"
+                  name="botcheck"
                   tabIndex={-1}
                   autoComplete="off"
                   aria-hidden="true"
-                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+                  style={{ display: "none" }}
                 />
 
                 <Field label="Name" error={errors.name} labelStyle={labelStyle} fieldErr={fieldErr}>
