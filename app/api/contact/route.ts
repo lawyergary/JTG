@@ -71,12 +71,25 @@ export async function POST(req: Request) {
       }),
     });
 
-    const data = (await res.json().catch(() => ({}))) as { success?: boolean; message?: string };
+    const raw = await res.text();
+    let data: { success?: boolean; message?: string } = {};
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      /* non-JSON (e.g. WAF/HTML) */
+    }
 
     if (!res.ok || !data.success) {
-      console.error("[contact] Web3Forms error:", res.status, data.message);
+      console.error("[contact] Web3Forms error:", res.status, raw.slice(0, 300));
       return NextResponse.json(
-        { error: "Could not send enquiry.", _diag: { status: res.status, message: data.message } },
+        {
+          error: "Could not send enquiry.",
+          _diag: {
+            status: res.status,
+            contentType: res.headers.get("content-type"),
+            body: raw.slice(0, 300),
+          },
+        },
         { status: 502 }
       );
     }
