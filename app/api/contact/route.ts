@@ -75,7 +75,10 @@ export async function POST(req: Request) {
 
     if (!res.ok || !data.success) {
       console.error("[contact] Web3Forms error:", res.status, data.message);
-      return NextResponse.json({ error: "Could not send enquiry." }, { status: 502 });
+      return NextResponse.json(
+        { error: "Could not send enquiry.", _diag: { status: res.status, message: data.message } },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({ ok: true, delivered: true });
