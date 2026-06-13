@@ -328,7 +328,7 @@ export default function Site() {
             background: p.background,
           }}
         >
-          <Image src={p.photo} alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: p.objectPosition }} />
+          <Image src={p.photo} alt="" fill sizes="100vw" className={`pillar-photo pillar-${p.id}`} style={{ objectFit: "cover", objectPosition: p.objectPosition }} />
           <div style={{ position: "absolute", inset: 0, background: p.scrim, pointerEvents: "none" }} />
           <div style={{ position: "relative", maxWidth: "62ch" }}>
             <div style={{ fontFamily: ARCHIVO, fontSize: 12, fontWeight: 600, letterSpacing: "0.32em", textTransform: "uppercase", color: CORAL, marginBottom: 18 }}>

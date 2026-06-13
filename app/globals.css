@@ -40,4 +40,8 @@ html{
   .dot-rail{display:none !important;}
   .nav-links > button:not(:last-child){display:none;}
   .nav-links{gap:0 !important;}
+
+  /* Reveal more of the right of these photos when cropped to portrait */
+  .pillar-activations{object-position:66% 42% !important;}
+  .pillar-events{object-position:66% 40% !important;}
 }
