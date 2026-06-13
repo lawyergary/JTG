@@ -122,14 +122,41 @@ export default function Site() {
       return;
     }
 
+    // Honeypot: bots fill this hidden field — silently accept without sending.
+    if (honeypot.current?.value) {
+      setSubmitted(true);
+      return;
+    }
+
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
+    if (!accessKey) {
+      // Key not configured yet — don't break the UX, just log.
+      console.warn("NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY is not set — enquiry not delivered.");
+      setSubmitted(true);
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const res = await fetch("/api/contact", {
+      // Submit directly to Web3Forms from the browser (its intended usage —
+      // server-to-server calls get blocked by Cloudflare's bot challenge).
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, company_url: honeypot.current?.value ?? "" }),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: `New enquiry from ${form.name} — ${form.company} (${form.service})`,
+          from_name: "Journey Travel Group Website",
+          replyto: form.email, // replies go straight to the enquirer
+          name: form.name,
+          company: form.company,
+          email: form.email,
+          service: form.service,
+          message: form.message,
+        }),
       });
-      if (!res.ok) throw new Error("Request failed");
+      const data = (await res.json().catch(() => ({}))) as { success?: boolean };
+      if (!res.ok || !data.success) throw new Error("Request failed");
       setSubmitted(true);
     } catch {
       setServerError("Something went wrong sending your enquiry. Please email us directly.");
